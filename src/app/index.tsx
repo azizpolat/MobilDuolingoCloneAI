@@ -1,4 +1,5 @@
-import { Text, View } from "react-native";
+import { Text, TouchableOpacity, View } from "react-native";
+import { Link } from "expo-router";
 
 export default function Index() {
   return (
@@ -32,6 +33,14 @@ export default function Index() {
             <Text className="mt-2 text-caption text-white/85 font-poppins">#21C16B</Text>
           </View>
         </View>
+      </View>
+
+      <View className="mt-6">
+        <Link href="/onboarding" asChild>
+          <TouchableOpacity className="rounded-3xl bg-brand-purple px-5 py-4 items-center">
+            <Text className="text-body-medium font-semibold text-white font-poppins">Open onboarding</Text>
+          </TouchableOpacity>
+        </Link>
       </View>
 
       <View className="mt-5 rounded-[28px] bg-neutral-surface border border-neutral-border p-5 shadow-lg shadow-card">
