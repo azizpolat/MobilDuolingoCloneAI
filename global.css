@@ -3,3 +3,62 @@
 @import "tailwindcss/utilities.css";
 
 @import "nativewind/theme";
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 400;
+  src: url("./assets/fonts/Poppins-Regular.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 500;
+  src: url("./assets/fonts/Poppins-Medium.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 600;
+  src: url("./assets/fonts/Poppins-SemiBold.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Poppins";
+  font-style: normal;
+  font-weight: 700;
+  src: url("./assets/fonts/Poppins-Bold.ttf") format("truetype");
+}
+
+:root {
+  color-scheme: light;
+  font-family: "Poppins", sans-serif;
+}
+
+@layer utilities {
+  .bg-surface {
+    background-color: theme("colors.neutral.surface");
+  }
+
+  .bg-background {
+    background-color: theme("colors.neutral.background");
+  }
+
+  .text-primary {
+    color: theme("colors.neutral.primary");
+  }
+
+  .text-secondary {
+    color: theme("colors.neutral.secondary");
+  }
+
+  .border-surface {
+    border-color: theme("colors.neutral.border");
+  }
+
+  .shadow-card {
+    box-shadow: 0 10px 30px rgba(13, 19, 43, 0.08);
+  }
+}
