@@ -18,8 +18,13 @@ import {
   View,
 } from "react-native";
 
+import { useAuth, useSignIn } from "@clerk/expo";
+
 export default function SignIn() {
   const router = useRouter();
+
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signIn } = useSignIn();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -31,21 +36,49 @@ export default function SignIn() {
 
   const codeInputs = useRef<(TextInput | null)[]>([]);
 
-  const isFormValid = email.trim().length > 0 && password.trim().length > 0;
+  const isFormValid = email.trim().length > 0;
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (!isFormValid) return;
 
-    // Önce kodu temizle
+    // Clear code
     setCode(["", "", "", "", "", ""]);
 
-    // Modalı aç
-    setShowVerificationModal(true);
+    try {
+      if (password.trim().length > 0) {
+        // Attempt password authentication
+        const { error } = await signIn.create({ identifier: email, password });
+        if (error) {
+          console.error("signIn.create error:", error);
+          return;
+        }
 
-    // Modal açıldıktan sonra ilk kutuya focus
-    setTimeout(() => {
-      codeInputs.current[0]?.focus();
-    }, 300);
+        // If sign-in creates a session, navigate to home
+        router.replace("/");
+        return;
+      }
+
+      // Passwordless: send email code
+      const { error } = await signIn.create({ identifier: email });
+      if (error) {
+        console.error("signIn.create (passwordless) error:", error);
+        return;
+      }
+
+      const { error: sendError } = await (signIn as any).verifications.sendEmailCode();
+      if (sendError) {
+        console.error("sendEmailCode error:", sendError);
+        return;
+      }
+
+      // Show verification modal and focus first input
+      setShowVerificationModal(true);
+      setTimeout(() => {
+        codeInputs.current[0]?.focus();
+      }, 300);
+    } catch (e) {
+      console.error("handleSignIn error:", e);
+    }
   };
 
   /*
@@ -71,14 +104,26 @@ export default function SignIn() {
       codeInputs.current[index + 1]?.focus();
     }
 
-    // 6 hane tamamlandı
+      // 6 hane tamamlandı
     if (nextCode.every((item) => item.length === 1)) {
-      setTimeout(() => {
-        setShowVerificationModal(false);
+      const combinedCode = nextCode.join("");
+      (async () => {
+        try {
+          const { error } = await (signIn as any).verifications.verifyEmailCode({ code: combinedCode });
+          if (error) {
+            console.error("verifyEmailCode error:", error);
+            return;
+          }
 
-        // Başarılı giriş sonrası Home
-        router.replace("/");
-      }, 150);
+          // On successful verification, navigate to home
+          setTimeout(() => {
+            setShowVerificationModal(false);
+            router.replace("/");
+          }, 150);
+        } catch (e) {
+          console.error("verification error:", e);
+        }
+      })();
     }
   };
 

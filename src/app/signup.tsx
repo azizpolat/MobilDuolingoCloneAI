@@ -2,7 +2,7 @@ import { images } from "@/constants/images";
 import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -18,8 +18,15 @@ import {
   View,
 } from "react-native";
 
-export default function SignIn() {
+import { useAuth, useSignUp } from "@clerk/expo";
+import { useHostedAuth } from "@clerk/expo/hosted-auth";
+
+export default function SignUp() {
   const router = useRouter();
+
+  const { isLoaded, isSignedIn } = useAuth();
+  const { signUp } = useSignUp();
+  const { startHostedAuth } = useHostedAuth();
 
   const [email, setEmail] = useState("");
   const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -30,28 +37,45 @@ export default function SignIn() {
 
   const isFormValid = email.trim().length > 0;
 
-  const handleSignIn = () => {
+  const handleSignIn = async () => {
     if (!isFormValid) return;
 
-    // Önce kodu temizle
-    setCode(["", "", "", "", "", ""]);
+    try {
+      // Create a passwordless sign-up and send verification code to email
+      const { error } = await signUp.create({ emailAddress: email });
+      if (error) {
+        console.error("signUp.create error:", error);
+        return;
+      }
 
-    // Modalı aç
-    setShowVerificationModal(true);
+      const { error: sendError } = await (signUp as any).verifications.sendEmailCode();
+      if (sendError) {
+        console.error("sendEmailCode error:", sendError);
+        return;
+      }
 
-    // Modal açıldıktan sonra ilk kutuya focus
-    setTimeout(() => {
-      codeInputs.current[0]?.focus();
-    }, 300);
+      setShowVerificationModal(true);
+
+      // focus first input after modal opens
+      setTimeout(() => {
+        codeInputs.current[0]?.focus();
+      }, 300);
+    } catch (error) {
+      console.error("handleSignIn error:", error);
+    }
   };
 
-  const handleCodeChange = (text: string, index: number) => {
-    // Sadece rakam kabul et
+  useEffect(() => {
+    if (isLoaded && isSignedIn) {
+      router.replace("/");
+    }
+  }, [isLoaded, isSignedIn, router]);
+
+  const handleCodeChange = async (text: string, index: number) => {
     if (!/^\d*$/.test(text)) {
       return;
     }
 
-    // Her kutuda sadece son girilen rakamı tut
     const digit = text.slice(-1);
 
     const nextCode = [...code];
@@ -60,24 +84,38 @@ export default function SignIn() {
 
     setCode(nextCode);
 
-    // Rakam girildiyse sonraki kutuya geç
     if (digit && index < 5) {
       codeInputs.current[index + 1]?.focus();
     }
 
-    // 6 hane tamamlandı
     if (nextCode.every((item) => item.length === 1)) {
-      setTimeout(() => {
-        setShowVerificationModal(false);
+      const combinedCode = nextCode.join("");
 
-        // Home
-        router.replace("/");
-      }, 150);
+      try {
+        const { error } = await (signUp as any).verifications.verifyEmailCode({ code: combinedCode });
+        if (error) {
+          console.error("verifyEmailCode error:", error);
+          return;
+        }
+
+        const { error: finalizeError } = await signUp.finalize();
+        if (finalizeError) {
+          console.error("signUp.finalize error:", finalizeError);
+          return;
+        }
+
+        // After finalize, Clerk should update useAuth and user will be signed in
+        setTimeout(() => {
+          setShowVerificationModal(false);
+          router.replace("/");
+        }, 150);
+      } catch (e) {
+        console.error("verification flow error:", e);
+      }
     }
   };
 
   const handleCodeKeyPress = (event: any, index: number) => {
-    // Backspace ile önceki kutuya dön
     if (event.nativeEvent.key === "Backspace" && !code[index] && index > 0) {
       codeInputs.current[index - 1]?.focus();
     }
@@ -174,7 +212,17 @@ export default function SignIn() {
               <View style={styles.divider} />
             </View>
 
-            <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              activeOpacity={0.8}
+              onPress={async () => {
+                try {
+                  await startHostedAuth({ mode: "sign-up" });
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+            >
               <View style={styles.socialIcon}>
                 <AntDesign name="google" size={21} color="#4285F4" />
               </View>
@@ -182,7 +230,17 @@ export default function SignIn() {
               <Text style={styles.socialText}>Continue with Google</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              activeOpacity={0.8}
+              onPress={async () => {
+                try {
+                  await startHostedAuth({ mode: "sign-up" });
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+            >
               <View style={styles.socialIcon}>
                 <FontAwesome name="facebook" size={21} color="#1877F2" />
               </View>
@@ -190,7 +248,17 @@ export default function SignIn() {
               <Text style={styles.socialText}>Continue with Facebook</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.socialButton} activeOpacity={0.8}>
+            <TouchableOpacity
+              style={styles.socialButton}
+              activeOpacity={0.8}
+              onPress={async () => {
+                try {
+                  await startHostedAuth({ mode: "sign-up" });
+                } catch (e) {
+                  console.error(e);
+                }
+              }}
+            >
               <View style={styles.socialIcon}>
                 <AntDesign name="apple" size={21} color="#000000" />
               </View>
@@ -200,79 +268,79 @@ export default function SignIn() {
 
             <View style={styles.signupContainer}>
               <Text style={styles.signupNormalText}>
-                Don't have an account?{" "}
+                Don't have an account? {" "}
               </Text>
 
-              <TouchableOpacity onPress={() => router.replace("/signup")}>
+              <TouchableOpacity onPress={() => router.replace("/signup")}> 
                 <Text style={styles.signupLink}>Sign Up</Text>
               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
-      </KeyboardAvoidingView>
 
-      <Modal
-        visible={showVerificationModal}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setShowVerificationModal(false)}
-      >
-        <KeyboardAvoidingView
-          style={styles.modalOverlay}
-          behavior={Platform.OS === "ios" ? "padding" : "height"}
+        <Modal
+          visible={showVerificationModal}
+          transparent
+          animationType="fade"
+          onRequestClose={() => setShowVerificationModal(false)}
         >
-          <View style={styles.modalContent}>
-            <TouchableOpacity
-              style={styles.modalClose}
-              onPress={() => setShowVerificationModal(false)}
-              hitSlop={10}
-            >
-              <Ionicons name="close" size={24} color="#6B7280" />
-            </TouchableOpacity>
+          <KeyboardAvoidingView
+            style={styles.modalOverlay}
+            behavior={Platform.OS === "ios" ? "padding" : "height"}
+          >
+            <View style={styles.modalContent}>
+              <TouchableOpacity
+                style={styles.modalClose}
+                onPress={() => setShowVerificationModal(false)}
+                hitSlop={10}
+              >
+                <Ionicons name="close" size={24} color="#6B7280" />
+              </TouchableOpacity>
 
-            <View style={styles.emailIconCircle}>
-              <Ionicons name="mail-outline" size={27} color="#5B2BFF" />
+              <View style={styles.emailIconCircle}>
+                <Ionicons name="mail-outline" size={27} color="#5B2BFF" />
+              </View>
+
+              <Text style={styles.modalTitle}>Check your email</Text>
+
+              <Text style={styles.modalDescription}>
+                We sent a 6-digit verification code to {" "}
+                <Text style={styles.modalEmail}>{email}</Text>. Enter it below.
+              </Text>
+
+              <View style={styles.codeRow}>
+                {code.map((digit, index) => (
+                  <TextInput
+                    key={index}
+                    ref={(element) => {
+                      codeInputs.current[index] = element;
+                    }}
+                    value={digit}
+                    onChangeText={(text) => handleCodeChange(text, index)}
+                    onKeyPress={(event) => handleCodeKeyPress(event, index)}
+                    keyboardType="number-pad"
+                    inputMode="numeric"
+                    maxLength={1}
+                    textAlign="center"
+                    selectTextOnFocus
+                    style={[
+                      styles.codeInput,
+                      digit ? styles.codeInputActive : null,
+                    ]}
+                  />
+                ))}
+              </View>
+
+              <TouchableOpacity
+                style={styles.cancelButton}
+                onPress={() => setShowVerificationModal(false)}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
             </View>
-
-            <Text style={styles.modalTitle}>Check your email</Text>
-
-            <Text style={styles.modalDescription}>
-              We sent a 6-digit verification code to{" "}
-              <Text style={styles.modalEmail}>{email}</Text>. Enter it below.
-            </Text>
-
-            <View style={styles.codeRow}>
-              {code.map((digit, index) => (
-                <TextInput
-                  key={index}
-                  ref={(element) => {
-                    codeInputs.current[index] = element;
-                  }}
-                  value={digit}
-                  onChangeText={(text) => handleCodeChange(text, index)}
-                  onKeyPress={(event) => handleCodeKeyPress(event, index)}
-                  keyboardType="number-pad"
-                  inputMode="numeric"
-                  maxLength={1}
-                  textAlign="center"
-                  selectTextOnFocus
-                  style={[
-                    styles.codeInput,
-                    digit ? styles.codeInputActive : null,
-                  ]}
-                />
-              ))}
-            </View>
-
-            <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setShowVerificationModal(false)}
-            >
-              <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </Modal>
+          </KeyboardAvoidingView>
+        </Modal>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -297,10 +365,6 @@ const styles = StyleSheet.create({
     paddingBottom: 35,
   },
 
-  /* ================================
-     BACK
-  ================================= */
-
   backButton: {
     width: 32,
     height: 32,
@@ -310,12 +374,8 @@ const styles = StyleSheet.create({
     marginLeft: -6,
   },
 
-  /* ================================
-     HEADER
-  ================================= */
-
   header: {
-    alignItems: "flex-start",
+    alignItems: "flex-end",
   },
 
   title: {
@@ -333,10 +393,6 @@ const styles = StyleSheet.create({
     lineHeight: 24,
     color: "#6B7280",
   },
-
-  /* ================================
-     MASCOT
-  ================================= */
 
   mascotContainer: {
     height: 185,
@@ -412,7 +468,25 @@ const styles = StyleSheet.create({
     backgroundColor: "#FCFCFF",
     paddingHorizontal: 17,
     paddingTop: 13,
+    marginBottom: 12,
+  },
+
+  passwordContainer: {
+    height: 96,
+    borderWidth: 1.2,
+    borderColor: "#E8EAF1",
+    borderRadius: 18,
+    backgroundColor: "#FCFCFF",
+    paddingLeft: 17,
+    paddingRight: 13,
+    paddingTop: 13,
     marginBottom: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+
+  passwordContent: {
+    flex: 1,
   },
 
   inputLabel: {
@@ -430,6 +504,13 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-Regular",
     fontSize: 16,
     color: "#0D132B",
+  },
+
+  eyeButton: {
+    width: 34,
+    height: 34,
+    alignItems: "center",
+    justifyContent: "center",
   },
 
   signInButton: {
@@ -465,10 +546,6 @@ const styles = StyleSheet.create({
     color: "#FFFFFF",
   },
 
-  /* ================================
-     DIVIDER
-  ================================= */
-
   dividerContainer: {
     width: "100%",
     flexDirection: "row",
@@ -488,10 +565,6 @@ const styles = StyleSheet.create({
     fontSize: 15,
     color: "#9CA3AF",
   },
-
-  /* ================================
-     SOCIAL BUTTONS
-  ================================= */
 
   socialButton: {
     width: "100%",
@@ -519,10 +592,6 @@ const styles = StyleSheet.create({
     color: "#111827",
   },
 
-  /* ================================
-     SIGN UP LINK
-  ================================= */
-
   signupContainer: {
     flexDirection: "row",
     justifyContent: "center",
@@ -541,10 +610,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: "#5B2BFF",
   },
-
-  /* ================================
-     VERIFICATION MODAL
-  ================================= */
 
   modalOverlay: {
     flex: 1,
@@ -616,10 +681,6 @@ const styles = StyleSheet.create({
     fontFamily: "Poppins-SemiBold",
     color: "#0D132B",
   },
-
-  /* ================================
-     CODE
-  ================================= */
 
   codeRow: {
     width: "100%",
