@@ -1,5 +1,5 @@
-import { Stack } from "expo-router";
 import { useFonts } from "expo-font";
+import { Stack } from "expo-router";
 import "../../global.css";
 
 const fontMap = {
@@ -16,5 +16,11 @@ export default function RootLayout() {
     return null;
   }
 
-  return <Stack />;
+  return (
+    <Stack
+      screenOptions={{
+        headerShown: false,
+      }}
+    ></Stack>
+  );
 }

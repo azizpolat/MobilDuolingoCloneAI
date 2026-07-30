@@ -14,77 +14,92 @@ export default function Onboarding() {
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
-      <View className="flex-1 bg-[#F4F3FF] px-6 pt-6">
-        <View className="items-center">
-          <View className="flex-row items-center gap-3">
-            <Image
-              source={images.mascotLogo}
-              className="h-10 w-10"
-              style={{ resizeMode: "contain" }}
-            />
-            <Text className="text-[20px] font-semibold text-neutral-primary font-poppins">
-              muolingo
-            </Text>
-          </View>
+
+      <View style={styles.screen}>
+        <View style={styles.logoContainer}>
+          <Image
+            source={images.mascotLogo}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
+
+          <Text style={styles.logoText}>muolingo</Text>
         </View>
 
-        <View className="mt-8 flex-1 rounded-[40px] bg-white p-6 shadow-card">
-          <View className="items-center">
-            <Text className="text-[34px] font-bold text-[#0D132B] font-poppins text-center">
+        {/* ================================
+            CONTENT
+        ================================= */}
+
+        <View style={styles.content}>
+          {/* Header */}
+          <View style={styles.heading}>
+            <Text style={styles.title}>
               Your AI language
-              <Text className="text-brand-purple"> teacher.</Text>
+              <Text style={styles.titlePurple}> teacher.</Text>
             </Text>
-            <Text className="mt-3 text-[15px] leading-7 text-[#6B7280] text-center font-poppins">
+
+            <Text style={styles.subtitle}>
               Real conversations, personalized lessons, anytime, anywhere.
             </Text>
           </View>
 
-          <View className="relative mt-8 flex-1 items-center justify-center">
-            <View className="absolute left-0 top-4 rounded-[24px] bg-[#EEF4FF] px-4 py-3">
-              <Text className="text-sm font-semibold text-[#111827] font-poppins">
-                Hello!
-              </Text>
-              <View style={styles.speechTailLightBlue} />
+          {/* ================================
+              ILLUSTRATION
+          ================================= */}
+
+          <View style={styles.illustrationArea}>
+            {/* Hello */}
+            <View style={styles.helloBubble}>
+              <Text style={styles.helloText}>Hello!</Text>
+
+              <View style={styles.helloTail} />
             </View>
 
-            <View className="absolute right-0 top-8 rounded-[24px] bg-[#EEF2FF] px-4 py-3">
-              <Text className="text-sm font-semibold text-[#4F46E5] font-poppins">
-                ¡Hola!
-              </Text>
-              <View style={styles.speechTailLightPurple} />
+            {/* Hola */}
+            <View style={styles.holaBubble}>
+              <Text style={styles.holaText}>¡Hola!</Text>
+
+              <View style={styles.holaTail} />
             </View>
 
-            <View className="absolute right-6 top-[40%] rounded-[24px] bg-[#FFF2F4] px-4 py-3">
-              <Text className="text-sm font-semibold text-[#EF4444] font-poppins">
-                你好!
-              </Text>
-              <View style={styles.speechTailLightPink} />
+            {/* Chinese */}
+            <View style={styles.chineseBubble}>
+              <Text style={styles.chineseText}>你好!</Text>
+
+              <View style={styles.chineseTail} />
             </View>
 
+            {/* Mascot */}
             <Image
               source={images.mascotWelcome}
-              className="h-[300px] w-full"
-              style={{ resizeMode: "contain" }}
+              style={styles.mascot}
+              resizeMode="contain"
             />
           </View>
 
-          <View className="mt-6 flex-row items-center justify-center gap-2">
-            <View className="h-3 w-3 rounded-full bg-brand-purple" />
-            <View className="h-3 w-3 rounded-full bg-[#D9D9D9]" />
-            <View className="h-3 w-3 rounded-full bg-[#D9D9D9]" />
-            <View className="h-3 w-3 rounded-full bg-[#D9D9D9]" />
+          {/* ================================
+              PAGINATION
+          ================================= */}
+
+          <View style={styles.pagination}>
+            <View style={[styles.paginationDot, styles.paginationDotActive]} />
+
+            <View style={styles.paginationDot} />
+            <View style={styles.paginationDot} />
+            <View style={styles.paginationDot} />
           </View>
 
-          <View className="mt-8">
-            <Link href="/signup" asChild>
-              <TouchableOpacity className="flex-row items-center justify-between rounded-[28px] bg-brand-purple px-6 py-4">
-                <Text className="text-base font-semibold text-white font-poppins ">
-                  Get Started
-                </Text>
-                <Text className="text-2xl font-semibold text-white">›</Text>
-              </TouchableOpacity>
-            </Link>
-          </View>
+          {/* ================================
+              GET STARTED
+          ================================= */}
+
+          <Link href="/signup" asChild>
+            <TouchableOpacity activeOpacity={0.85} style={styles.getStarted}>
+              <Text style={styles.getStartedText}>Get Started</Text>
+
+              <Text style={styles.arrow}>›</Text>
+            </TouchableOpacity>
+          </Link>
         </View>
       </View>
     </SafeAreaView>
@@ -92,35 +107,285 @@ export default function Onboarding() {
 }
 
 const styles = StyleSheet.create({
+  /* ================================
+     SCREEN
+  ================================= */
+
   safeArea: {
     flex: 1,
-    backgroundColor: "#F4F3FF",
+    backgroundColor: "#FFFFFF",
   },
-  speechTailLightBlue: {
+
+  screen: {
+    flex: 1,
+    backgroundColor: "#FFFFFF",
+    paddingHorizontal: 40,
+    paddingTop: 16,
+  },
+
+  /* ================================
+     LOGO
+  ================================= */
+
+  logoContainer: {
+    height: 48,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  logoImage: {
+    width: 42,
+    height: 42,
+    marginRight: 10,
+  },
+
+  logoText: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 21,
+    color: "#0D132B",
+  },
+
+  /* ================================
+     CONTENT
+  ================================= */
+
+  content: {
+    flex: 1,
+    marginTop: 18,
+    paddingTop: 10,
+    paddingBottom: 25,
+  },
+
+  /* ================================
+     HEADER
+  ================================= */
+
+  heading: {
+    alignItems: "center",
+    paddingHorizontal: 0,
+  },
+
+  title: {
+    fontFamily: "Poppins-Bold",
+    fontSize: 32,
+    lineHeight: 40,
+    color: "#0D132B",
+    textAlign: "center",
+    letterSpacing: -0.7,
+  },
+
+  titlePurple: {
+    color: "#5B2BFF",
+  },
+
+  subtitle: {
+    marginTop: 8,
+    fontFamily: "Poppins-Regular",
+    fontSize: 16,
+    lineHeight: 24,
+    color: "#6B7280",
+    textAlign: "center",
+    maxWidth: 330,
+  },
+
+  /* ================================
+     ILLUSTRATION
+  ================================= */
+
+  illustrationArea: {
+    flex: 1,
+    minHeight: 300,
+    position: "relative",
+    alignItems: "center",
+    justifyContent: "center",
+    marginTop: 4,
+    marginBottom: 4,
+  },
+
+  mascot: {
+    width: "100%",
+    height: 300,
+  },
+
+  /* ================================
+     HELLO BUBBLE
+  ================================= */
+
+  helloBubble: {
     position: "absolute",
-    bottom: -6,
-    left: 16,
-    width: 12,
-    height: 12,
+    left: -4,
+    top: 38,
+    minWidth: 80,
+    height: 48,
+    paddingHorizontal: 17,
+    borderRadius: 24,
     backgroundColor: "#EEF4FF",
-    transform: [{ rotate: "45deg" }],
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5,
   },
-  speechTailLightPurple: {
+
+  helloText: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 14,
+    color: "#111827",
+  },
+
+  helloTail: {
     position: "absolute",
+    left: 18,
     bottom: -6,
-    left: 16,
-    width: 12,
-    height: 12,
+    width: 13,
+    height: 13,
+    backgroundColor: "#EEF4FF",
+    transform: [
+      {
+        rotate: "45deg",
+      },
+    ],
+  },
+
+  /* ================================
+     HOLA BUBBLE
+  ================================= */
+
+  holaBubble: {
+    position: "absolute",
+    right: -4,
+    top: 58,
+    minWidth: 80,
+    height: 48,
+    paddingHorizontal: 17,
+    borderRadius: 24,
     backgroundColor: "#EEF2FF",
-    transform: [{ rotate: "45deg" }],
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5,
   },
-  speechTailLightPink: {
+
+  holaText: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 14,
+    color: "#4F46E5",
+  },
+
+  holaTail: {
     position: "absolute",
+    left: 18,
     bottom: -6,
-    left: 16,
-    width: 12,
-    height: 12,
+    width: 13,
+    height: 13,
+    backgroundColor: "#EEF2FF",
+    transform: [
+      {
+        rotate: "45deg",
+      },
+    ],
+  },
+
+  /* ================================
+     CHINESE BUBBLE
+  ================================= */
+
+  chineseBubble: {
+    position: "absolute",
+    right: 20,
+    top: "48%",
+    minWidth: 76,
+    height: 48,
+    paddingHorizontal: 17,
+    borderRadius: 24,
     backgroundColor: "#FFF2F4",
-    transform: [{ rotate: "45deg" }],
+    alignItems: "center",
+    justifyContent: "center",
+    zIndex: 5,
+  },
+
+  chineseText: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 14,
+    color: "#EF4444",
+  },
+
+  chineseTail: {
+    position: "absolute",
+    left: 18,
+    bottom: -6,
+    width: 13,
+    height: 13,
+    backgroundColor: "#FFF2F4",
+    transform: [
+      {
+        rotate: "45deg",
+      },
+    ],
+  },
+
+  /* ================================
+     PAGINATION
+  ================================= */
+
+  pagination: {
+    height: 14,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    gap: 8,
+    marginTop: 6,
+    marginBottom: 22,
+  },
+
+  paginationDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: "#D9D9D9",
+  },
+
+  paginationDotActive: {
+    width: 11,
+    height: 11,
+    borderRadius: 6,
+    backgroundColor: "#5B2BFF",
+  },
+
+  /* ================================
+     GET STARTED
+  ================================= */
+
+  getStarted: {
+    width: "100%",
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: "#5B2BFF",
+    paddingHorizontal: 24,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+
+    shadowColor: "#5B2BFF",
+    shadowOpacity: 0.2,
+    shadowRadius: 18,
+    shadowOffset: {
+      width: 0,
+      height: 8,
+    },
+
+    elevation: 5,
+  },
+
+  getStartedText: {
+    fontFamily: "Poppins-SemiBold",
+    fontSize: 18,
+    color: "#FFFFFF",
+  },
+
+  arrow: {
+    fontFamily: "Poppins-Regular",
+    fontSize: 32,
+    lineHeight: 34,
+    color: "#FFFFFF",
+    marginTop: -2,
   },
 });
