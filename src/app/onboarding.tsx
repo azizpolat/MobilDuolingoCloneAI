@@ -76,7 +76,7 @@ export default function Onboarding() {
           </View>
 
           <View className="mt-8">
-            <Link href="/" asChild>
+            <Link href="/signup" asChild>
               <TouchableOpacity className="flex-row items-center justify-between rounded-[28px] bg-brand-purple px-6 py-4">
                 <Text className="text-base font-semibold text-white font-poppins">
                   Get Started
