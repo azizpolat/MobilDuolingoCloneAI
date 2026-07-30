@@ -5,6 +5,7 @@ import React, { useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
+  Modal,
   Platform,
   SafeAreaView,
   ScrollView,
@@ -19,8 +20,44 @@ export default function SignUp() {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showModal, setShowModal] = useState(false);
+  const [code, setCode] = useState(["", "", "", "", "", ""]);
+  const inputs = React.useRef<(TextInput | null)[]>([]);
 
   const isValid = email.trim().length > 0 && password.trim().length > 0;
+
+  function openVerification() {
+    // show verification modal after inputs validated
+    setShowModal(true);
+  }
+
+  function handleCodeChange(text: string, idx: number) {
+    if (!/^[0-9]*$/.test(text)) return;
+    const digit = text.slice(-1);
+    const next = [...code];
+    next[idx] = digit || "";
+    setCode(next);
+
+    if (digit) {
+      if (idx < inputs.current.length - 1) {
+        inputs.current[idx + 1]?.focus();
+      }
+    }
+
+    if (next.every((d) => d.length === 1)) {
+      setTimeout(() => {
+        setShowModal(false);
+        // proceed to home
+        // replace navigation after successful verification
+        // small delay to let UI update
+        setTimeout(() => {
+          // navigate
+          // @ts-ignore router
+          router.replace("/");
+        }, 150);
+      }, 250);
+    }
+  }
 
   return (
     <SafeAreaView style={styles.appBackground}>
@@ -91,7 +128,7 @@ export default function SignUp() {
                 disabled={!isValid}
                 onPress={() => {
                   if (isValid) {
-                    router.replace("/");
+                    openVerification();
                   }
                 }}
                 className={`rounded-[14px] px-6 py-4 items-center mb-6 ${
@@ -101,6 +138,39 @@ export default function SignUp() {
               >
                 <Text className="text-white text-lg font-semibold font-poppins">Sign Up</Text>
               </TouchableOpacity>
+
+              {/* Verification modal */}
+              <Modal visible={showModal} transparent animationType="fade">
+                <KeyboardAvoidingView
+                  behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                  style={styles.modalContainer}
+                >
+                  <View style={styles.modalContent}>
+                    <Text className="text-lg font-semibold mb-2">Check your email</Text>
+                    <Text className="text-sm text-[#6B7280] mb-4">We sent a 6-digit verification code to {email || 'your email'}. Enter it below.</Text>
+
+                    <View style={styles.codeRow}>
+                      {code.map((digit, idx) => (
+                        <TextInput
+                          key={idx}
+                          ref={(el) => { inputs.current[idx] = el; }}
+                          value={digit}
+                          onChangeText={(t) => handleCodeChange(t, idx)}
+                          keyboardType="number-pad"
+                          maxLength={1}
+                          style={styles.codeInput}
+                          textAlign="center"
+                          placeholder="-"
+                        />
+                      ))}
+                    </View>
+
+                    <TouchableOpacity className="mt-6" onPress={() => setShowModal(false)}>
+                      <Text className="text-[#6B7280]">Cancel</Text>
+                    </TouchableOpacity>
+                  </View>
+                </KeyboardAvoidingView>
+              </Modal>
 
               <View className="flex-row items-center justify-center mb-4">
                 <View className="h-px flex-1 bg-[#E9E9F0] mr-3" />
@@ -148,4 +218,8 @@ const styles = StyleSheet.create({
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 8 },
   },
+  modalContainer: { flex: 1, justifyContent: "center", alignItems: "center", padding: 24 },
+  modalContent: { width: "100%", backgroundColor: "white", borderRadius: 16, padding: 20, alignItems: "center", shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 10 },
+  codeRow: { flexDirection: "row", justifyContent: "space-between", width: "100%", paddingHorizontal: 12 },
+  codeInput: { width: 44, height: 56, borderRadius: 10, borderWidth: 1, borderColor: "#E9E9F0", fontSize: 20 },
 });
