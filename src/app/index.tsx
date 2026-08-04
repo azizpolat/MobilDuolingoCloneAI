@@ -26,8 +26,8 @@ export default function Index() {
       )}
 
       <Link href="/language-selection" asChild>
-        <TouchableOpacity className="mt-4 flex-row items-center justify-between rounded-[28px] bg-white px-6 py-4">
-          <Text className="text-neutral-900">Choose language</Text>
+        <TouchableOpacity className="mt-4 flex-row items-center justify-between rounded-[28px] bg-green-300 px-6 py-4">
+          <Text className="text-neutral-900 ">Choose Language</Text>
         </TouchableOpacity>
       </Link>
     </View>

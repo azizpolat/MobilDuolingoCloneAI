@@ -1,18 +1,31 @@
-import React, { useState } from 'react';
-import { Image, Text, TextInput, TouchableOpacity, View } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { languages } from '@/data/languages';
-import { images } from '@/constants/images';
+import { images } from "@/constants/images";
+import { languages } from "@/data/languages";
+import { Link, useRouter } from "expo-router";
+import { useState } from "react";
+import {
+  ActivityIndicator,
+  Image,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  View,
+} from "react-native";
 
 export default function LanguageSelection() {
-  const [query, setQuery] = useState('');
-  const [selectedCode, setSelectedCode] = useState<string | null>(languages[0]?.code ?? null);
+  const [query, setQuery] = useState("");
+
+  const [selectedCode, setSelectedCode] = useState<string | null>(
+    languages[0]?.code ?? null,
+  );
   const router = useRouter();
 
-  const filtered = languages.filter((l) =>
-    l.name.toLowerCase().includes(query.toLowerCase()) ||
-    l.nativeName.toLowerCase().includes(query.toLowerCase())
+  const filtered = languages.filter(
+    (l) =>
+      l.name.toLowerCase().includes(query.toLowerCase()) ||
+      l.nativeName.toLowerCase().includes(query.toLowerCase()),
   );
+
+  const [isLoadingEarth, setIsLoadingEarth] = useState(true);
 
   return (
     <View className="flex-1 bg-neutral-background px-6 pt-12">
@@ -23,7 +36,9 @@ export default function LanguageSelection() {
             <Text className="text-2xl">‹</Text>
           </TouchableOpacity>
         </Link>
-        <Text className="flex-1 text-center text-lg font-semibold">Choose a language</Text>
+        <Text className="flex-1 text-center text-lg font-semibold">
+          Choose a language
+        </Text>
         <View style={{ width: 40 }} />
       </View>
 
@@ -51,14 +66,17 @@ export default function LanguageSelection() {
               key={lang.code}
               activeOpacity={0.8}
               onPress={() => setSelectedCode(lang.code)}
-              className={`flex-row items-center bg-white rounded-2xl px-4 py-4 ${selected ? 'border-2 border-purple-500' : ''}`}
+              className={`flex-row items-center bg-white rounded-2xl px-4 py-4 ${selected ? "border-2 border-purple-500" : ""}`}
             >
               <View className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mr-4">
-                <Text className="text-xl">{lang.flag}</Text>
+                <Image
+                  source={{ uri: lang.flag }}
+                  style={{ width: 32, height: 32, borderRadius: 16 }}
+                />
               </View>
               <View className="flex-1">
                 <Text className="font-medium text-base">{lang.name}</Text>
-                <Text className="text-sm text-muted">{lang.description}</Text>
+                <Text className="text-sm text-muted">{lang.learners}</Text>
               </View>
 
               {selected ? (
@@ -72,22 +90,35 @@ export default function LanguageSelection() {
           );
         })}
 
-        {/* Confirmation button */}
-        <View className="mt-2">
+        <View className="mt-2 items-center justify-center">
           <TouchableOpacity
             onPress={() => {
-              // For now navigate back to home; in the real app this should persist selection to store
-              router.push('/');
+              router.push("/");
             }}
-            className="flex-row items-center bg-white rounded-2xl px-4 py-4 justify-center"
+            className="mt-8 flex-row rounded-[28px] bg-brand-purple px-6 py-4"
           >
-            <Text className="text-base font-medium">Confirm language</Text>
+            <Text className="text-base text-white font-bold">
+              Confirm Language
+            </Text>
           </TouchableOpacity>
         </View>
 
-        {/* Earth image at bottom */}
         <View className="items-center mt-auto mb-4">
-          <Image source={images.earth} style={{ width: 360, height: 120, resizeMode: 'contain' }} />
+          {isLoadingEarth && (
+            <ActivityIndicator className="absolute" size="large" />
+          )}
+
+          <Image
+            source={images.earth}
+            onLoadStart={() => setIsLoadingEarth(true)}
+            onLoadEnd={() => setIsLoadingEarth(false)}
+            style={{
+              width: 320,
+              height: 210,
+              resizeMode: "cover",
+              opacity: isLoadingEarth ? 0 : 1,
+            }}
+          />
         </View>
       </View>
     </View>
