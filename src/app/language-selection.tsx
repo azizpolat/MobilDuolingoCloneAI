@@ -1,21 +1,21 @@
 import { images } from "@/constants/images";
 import { languages } from "@/data/languages";
+import { useLanguageStore } from "@/store/language-store";
 import { Link, useRouter } from "expo-router";
 import { useState } from "react";
-import {
-  ActivityIndicator,
-  Image,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-
-import { useLanguageStore } from "@/store/language-store";
+import { Image, Text, TextInput, TouchableOpacity, View } from "react-native";
 
 export default function LanguageSelection() {
   const [query, setQuery] = useState("");
-  const { selectedLanguageCode, setSelectedLanguageCode } = useLanguageStore();
+
+  const selectedLanguageCode = useLanguageStore(
+    (state) => state.selectedLanguageCode,
+  );
+
+  const setSelectedLanguageCode = useLanguageStore(
+    (state) => state.setSelectedLanguageCode,
+  );
+
   const router = useRouter();
 
   const filtered = languages.filter(
@@ -24,15 +24,17 @@ export default function LanguageSelection() {
       language.nativeName.toLowerCase().includes(query.toLowerCase()),
   );
 
-  const [isLoadingEarth, setIsLoadingEarth] = useState(true);
-  const selectedCode = selectedLanguageCode ?? languages[0]?.code ?? null;
+  const selectedCode = selectedLanguageCode;
 
   const handleConfirmLanguage = () => {
-    if (!selectedCode) {
-      return;
-    }
+    if (!selectedCode) return;
 
     setSelectedLanguageCode(selectedCode);
+
+    router.replace("/");
+  };
+
+  const handlePress = () => {
     router.replace("/");
   };
 
@@ -40,14 +42,16 @@ export default function LanguageSelection() {
     <View className="flex-1 bg-neutral-background px-6 pt-12">
       {/* Header */}
       <View className="flex-row items-center mb-4">
-        <Link href=".." asChild>
-          <TouchableOpacity className="p-2">
+        <Link href="..">
+          <TouchableOpacity className="p-2" onPress={() => handlePress()}>
             <Text className="text-2xl">‹</Text>
           </TouchableOpacity>
         </Link>
+
         <Text className="flex-1 text-center text-lg font-semibold">
           Choose a language
         </Text>
+
         <View style={{ width: 40 }} />
       </View>
 
@@ -55,6 +59,7 @@ export default function LanguageSelection() {
       <View className="mb-6">
         <View className="flex-row items-center bg-white rounded-full px-4 py-3 shadow-sm">
           <Text className="text-muted mr-3">🔍</Text>
+
           <TextInput
             value={query}
             onChangeText={setQuery}
@@ -67,24 +72,41 @@ export default function LanguageSelection() {
 
       <Text className="mb-3 font-semibold">Popular</Text>
 
-      <View className="space-y-3 flex-1">
+      <View className="flex-1">
         {filtered.map((lang) => {
           const selected = lang.code === selectedCode;
+
           return (
             <TouchableOpacity
               key={lang.code}
               activeOpacity={0.8}
               onPress={() => setSelectedLanguageCode(lang.code)}
-              className={`flex-row items-center bg-white rounded-2xl px-4 py-4 ${selected ? "border-2 border-purple-500" : ""}`}
+              className={`
+                flex-row items-center
+                bg-white
+                rounded-2xl
+                px-4
+                py-4
+                mb-3
+                ${selected ? "border-2 border-purple-500" : ""}
+              `}
             >
               <View className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mr-4">
                 <Image
-                  source={{ uri: lang.flag }}
-                  style={{ width: 32, height: 32, borderRadius: 16 }}
+                  source={{
+                    uri: lang.flag,
+                  }}
+                  style={{
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                  }}
                 />
               </View>
+
               <View className="flex-1">
                 <Text className="font-medium text-base">{lang.name}</Text>
+
                 <Text className="text-sm text-muted">{lang.learners}</Text>
               </View>
 
@@ -99,10 +121,15 @@ export default function LanguageSelection() {
           );
         })}
 
-        <View className="mt-2 items-center justify-center">
+        <View className="items-center mt-4">
           <TouchableOpacity
             onPress={handleConfirmLanguage}
-            className="mt-8 flex-row rounded-[28px] bg-brand-purple px-6 py-4"
+            className="
+              rounded-[28px]
+              bg-brand-purple
+              px-6
+              py-4
+            "
           >
             <Text className="text-base text-white font-bold">
               Confirm Language
@@ -110,20 +137,14 @@ export default function LanguageSelection() {
           </TouchableOpacity>
         </View>
 
-        <View className="items-center mt-auto mb-4">
-          {isLoadingEarth && (
-            <ActivityIndicator className="absolute" size="large" />
-          )}
-
+        {/* Earth Image */}
+        <View className="flex-1 justify-end items-center">
           <Image
             source={images.earth}
-            onLoadStart={() => setIsLoadingEarth(true)}
-            onLoadEnd={() => setIsLoadingEarth(false)}
             style={{
-              width: 320,
-              height: 210,
-              resizeMode: "cover",
-              opacity: isLoadingEarth ? 0 : 1,
+              width: 360,
+              height: 220,
+              resizeMode: "contain",
             }}
           />
         </View>

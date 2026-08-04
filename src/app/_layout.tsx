@@ -1,9 +1,9 @@
+import { ClerkProvider, useAuth } from "@clerk/expo";
+import { tokenCache } from "@clerk/expo/token-cache";
 import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
 import { useEffect } from "react";
 import "../../global.css";
-import { ClerkProvider, useAuth } from "@clerk/expo";
-import { tokenCache } from "@clerk/expo/token-cache";
 
 import { useLanguageStore } from "@/store/language-store";
 
@@ -16,29 +16,49 @@ const fontMap = {
 
 function NavigationGuard() {
   const { isLoaded, isSignedIn } = useAuth();
+
   const router = useRouter();
   const segments = useSegments();
-  const { hasHydrated, selectedLanguageCode } = useLanguageStore((state) => ({
-    hasHydrated: state.hasHydrated,
-    selectedLanguageCode: state.selectedLanguageCode,
-  }));
+
+  const hasHydrated = useLanguageStore((state) => state.hasHydrated);
+
+  const selectedLanguageCode = useLanguageStore(
+    (state) => state.selectedLanguageCode,
+  );
+
+  const currentRoute = segments[0] ?? "";
 
   useEffect(() => {
     if (!isLoaded || !hasHydrated) {
       return;
     }
 
-    const isOnLanguageSelectionRoute = segments[0] === "language-selection";
+    if (!isSignedIn) {
+      return;
+    }
 
-    if (isSignedIn && !selectedLanguageCode && !isOnLanguageSelectionRoute) {
+    const shouldGoToLanguage =
+      !selectedLanguageCode && currentRoute !== "language-selection";
+
+    if (shouldGoToLanguage) {
       router.replace("/language-selection");
       return;
     }
 
-    if (isSignedIn && selectedLanguageCode && isOnLanguageSelectionRoute) {
+    const shouldGoHome =
+      !!selectedLanguageCode && currentRoute === "language-selection";
+
+    if (shouldGoHome) {
       router.replace("/");
     }
-  }, [hasHydrated, isLoaded, isSignedIn, router, segments, selectedLanguageCode]);
+  }, [
+    isLoaded,
+    hasHydrated,
+    isSignedIn,
+    selectedLanguageCode,
+    currentRoute,
+    router,
+  ]);
 
   return null;
 }
@@ -52,26 +72,29 @@ export default function RootLayout() {
     return null;
   }
 
-  // If publishable key is not provided, render normally but warn — the app will not have auth enabled.
   if (!publishableKey) {
-    console.warn("EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY is not set. Clerk will not be initialized.");
+    console.warn(
+      "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY is not set. Clerk will not be initialized.",
+    );
+
     return (
       <Stack
         screenOptions={{
           headerShown: false,
         }}
-      ></Stack>
+      />
     );
   }
 
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
       <NavigationGuard />
+
       <Stack
         screenOptions={{
           headerShown: false,
         }}
-      ></Stack>
+      />
     </ClerkProvider>
   );
 }
