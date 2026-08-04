@@ -24,6 +24,12 @@ export default function Index() {
           </TouchableOpacity>
         </Link>
       )}
+
+      <Link href="/language-selection" asChild>
+        <TouchableOpacity className="mt-4 flex-row items-center justify-between rounded-[28px] bg-white px-6 py-4">
+          <Text className="text-neutral-900">Choose language</Text>
+        </TouchableOpacity>
+      </Link>
     </View>
   );
 }
