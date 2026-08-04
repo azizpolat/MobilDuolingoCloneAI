@@ -1,8 +1,11 @@
 import { useFonts } from "expo-font";
-import { Stack } from "expo-router";
+import { Stack, useRouter, useSegments } from "expo-router";
+import { useEffect } from "react";
 import "../../global.css";
-import { ClerkProvider } from "@clerk/expo";
+import { ClerkProvider, useAuth } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
+
+import { useLanguageStore } from "@/store/language-store";
 
 const fontMap = {
   Poppins_400Regular: require("../../assets/fonts/Poppins-Regular.ttf"),
@@ -10,6 +13,35 @@ const fontMap = {
   Poppins_600SemiBold: require("../../assets/fonts/Poppins-SemiBold.ttf"),
   Poppins_700Bold: require("../../assets/fonts/Poppins-Bold.ttf"),
 };
+
+function NavigationGuard() {
+  const { isLoaded, isSignedIn } = useAuth();
+  const router = useRouter();
+  const segments = useSegments();
+  const { hasHydrated, selectedLanguageCode } = useLanguageStore((state) => ({
+    hasHydrated: state.hasHydrated,
+    selectedLanguageCode: state.selectedLanguageCode,
+  }));
+
+  useEffect(() => {
+    if (!isLoaded || !hasHydrated) {
+      return;
+    }
+
+    const isOnLanguageSelectionRoute = segments[0] === "language-selection";
+
+    if (isSignedIn && !selectedLanguageCode && !isOnLanguageSelectionRoute) {
+      router.replace("/language-selection");
+      return;
+    }
+
+    if (isSignedIn && selectedLanguageCode && isOnLanguageSelectionRoute) {
+      router.replace("/");
+    }
+  }, [hasHydrated, isLoaded, isSignedIn, router, segments, selectedLanguageCode]);
+
+  return null;
+}
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts(fontMap);
@@ -34,6 +66,7 @@ export default function RootLayout() {
 
   return (
     <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      <NavigationGuard />
       <Stack
         screenOptions={{
           headerShown: false,

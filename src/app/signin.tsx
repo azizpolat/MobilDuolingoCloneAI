@@ -18,13 +18,15 @@ import {
   View,
 } from "react-native";
 
-import { useAuth, useSignIn } from "@clerk/expo";
+import { useSignIn } from "@clerk/expo";
+
+import { useLanguageStore } from "@/store/language-store";
 
 export default function SignIn() {
   const router = useRouter();
 
-  const { isLoaded, isSignedIn } = useAuth();
   const { signIn } = useSignIn();
+  const { selectedLanguageCode } = useLanguageStore();
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -53,8 +55,8 @@ export default function SignIn() {
           return;
         }
 
-        // If sign-in creates a session, navigate to home
-        router.replace("/");
+        // If sign-in creates a session, navigate to the appropriate route
+        router.replace(selectedLanguageCode ? "/" : "/language-selection");
         return;
       }
 
@@ -119,10 +121,10 @@ export default function SignIn() {
             return;
           }
 
-          // On successful verification, navigate to home
+          // On successful verification, navigate to the appropriate route
           setTimeout(() => {
             setShowVerificationModal(false);
-            router.replace("/");
+            router.replace(selectedLanguageCode ? "/" : "/language-selection");
           }, 150);
         } catch (e) {
           console.error("verification error:", e);
@@ -299,7 +301,7 @@ export default function SignIn() {
             {/* Sign Up */}
             <View style={styles.signupContainer}>
               <Text style={styles.signupNormalText}>
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
               </Text>
 
               <TouchableOpacity onPress={() => router.replace("/signup")}>

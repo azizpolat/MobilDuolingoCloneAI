@@ -21,12 +21,15 @@ import {
 import { useAuth, useSignUp } from "@clerk/expo";
 import { useHostedAuth } from "@clerk/expo/hosted-auth";
 
+import { useLanguageStore } from "@/store/language-store";
+
 export default function SignUp() {
   const router = useRouter();
 
   const { isLoaded, isSignedIn } = useAuth();
   const { signUp } = useSignUp();
   const { startHostedAuth } = useHostedAuth();
+  const { selectedLanguageCode } = useLanguageStore();
 
   const [email, setEmail] = useState("");
   const [showVerificationModal, setShowVerificationModal] = useState(false);
@@ -69,9 +72,9 @@ export default function SignUp() {
 
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      router.replace("/");
+      router.replace(selectedLanguageCode ? "/" : "/language-selection");
     }
-  }, [isLoaded, isSignedIn, router]);
+  }, [isLoaded, isSignedIn, router, selectedLanguageCode]);
 
   const handleCodeChange = async (text: string, index: number) => {
     if (!/^\d*$/.test(text)) {
@@ -109,7 +112,7 @@ export default function SignUp() {
             navigate: ({ session }) => {
               if (session?.currentTask) return;
               setShowVerificationModal(false);
-              router.replace("/");
+              router.replace(selectedLanguageCode ? "/" : "/language-selection");
             },
           });
         } else {
@@ -278,7 +281,7 @@ export default function SignUp() {
 
             <View style={styles.signupContainer}>
               <Text style={styles.signupNormalText}>
-                Don't have an account?{" "}
+                Don&apos;t have an account?{" "}
               </Text>
 
               <TouchableOpacity onPress={() => router.replace("/signup")}>

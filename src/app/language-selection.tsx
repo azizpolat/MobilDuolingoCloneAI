@@ -11,21 +11,30 @@ import {
   View,
 } from "react-native";
 
+import { useLanguageStore } from "@/store/language-store";
+
 export default function LanguageSelection() {
   const [query, setQuery] = useState("");
-
-  const [selectedCode, setSelectedCode] = useState<string | null>(
-    languages[0]?.code ?? null,
-  );
+  const { selectedLanguageCode, setSelectedLanguageCode } = useLanguageStore();
   const router = useRouter();
 
   const filtered = languages.filter(
-    (l) =>
-      l.name.toLowerCase().includes(query.toLowerCase()) ||
-      l.nativeName.toLowerCase().includes(query.toLowerCase()),
+    (language) =>
+      language.name.toLowerCase().includes(query.toLowerCase()) ||
+      language.nativeName.toLowerCase().includes(query.toLowerCase()),
   );
 
   const [isLoadingEarth, setIsLoadingEarth] = useState(true);
+  const selectedCode = selectedLanguageCode ?? languages[0]?.code ?? null;
+
+  const handleConfirmLanguage = () => {
+    if (!selectedCode) {
+      return;
+    }
+
+    setSelectedLanguageCode(selectedCode);
+    router.replace("/");
+  };
 
   return (
     <View className="flex-1 bg-neutral-background px-6 pt-12">
@@ -65,7 +74,7 @@ export default function LanguageSelection() {
             <TouchableOpacity
               key={lang.code}
               activeOpacity={0.8}
-              onPress={() => setSelectedCode(lang.code)}
+              onPress={() => setSelectedLanguageCode(lang.code)}
               className={`flex-row items-center bg-white rounded-2xl px-4 py-4 ${selected ? "border-2 border-purple-500" : ""}`}
             >
               <View className="w-12 h-12 rounded-full bg-gray-100 items-center justify-center mr-4">
@@ -92,9 +101,7 @@ export default function LanguageSelection() {
 
         <View className="mt-2 items-center justify-center">
           <TouchableOpacity
-            onPress={() => {
-              router.push("/");
-            }}
+            onPress={handleConfirmLanguage}
             className="mt-8 flex-row rounded-[28px] bg-brand-purple px-6 py-4"
           >
             <Text className="text-base text-white font-bold">
