@@ -23,12 +23,8 @@ export default function Onboarding() {
             resizeMode="contain"
           />
 
-          <Text style={styles.logoText}>muolingo</Text>
+          <Text style={styles.logoText}>Duolingo</Text>
         </View>
-
-        {/* ================================
-            CONTENT
-        ================================= */}
 
         <View style={styles.content}>
           {/* Header */}
@@ -42,10 +38,6 @@ export default function Onboarding() {
               Real conversations, personalized lessons, anytime, anywhere.
             </Text>
           </View>
-
-          {/* ================================
-              ILLUSTRATION
-          ================================= */}
 
           <View style={styles.illustrationArea}>
             {/* Hello */}
@@ -77,10 +69,6 @@ export default function Onboarding() {
             />
           </View>
 
-          {/* ================================
-              PAGINATION
-          ================================= */}
-
           <View style={styles.pagination}>
             <View style={[styles.paginationDot, styles.paginationDotActive]} />
 
@@ -88,10 +76,6 @@ export default function Onboarding() {
             <View style={styles.paginationDot} />
             <View style={styles.paginationDot} />
           </View>
-
-          {/* ================================
-              GET STARTED
-          ================================= */}
 
           <Link href="/signup" asChild>
             <TouchableOpacity activeOpacity={0.85} style={styles.getStarted}>
@@ -107,10 +91,6 @@ export default function Onboarding() {
 }
 
 const styles = StyleSheet.create({
-  /* ================================
-     SCREEN
-  ================================= */
-
   safeArea: {
     flex: 1,
     backgroundColor: "#FFFFFF",
@@ -122,10 +102,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 40,
     paddingTop: 16,
   },
-
-  /* ================================
-     LOGO
-  ================================= */
 
   logoContainer: {
     height: 48,
@@ -146,20 +122,12 @@ const styles = StyleSheet.create({
     color: "#0D132B",
   },
 
-  /* ================================
-     CONTENT
-  ================================= */
-
   content: {
     flex: 1,
     marginTop: 18,
     paddingTop: 10,
     paddingBottom: 25,
   },
-
-  /* ================================
-     HEADER
-  ================================= */
 
   heading: {
     alignItems: "center",
@@ -189,10 +157,6 @@ const styles = StyleSheet.create({
     maxWidth: 330,
   },
 
-  /* ================================
-     ILLUSTRATION
-  ================================= */
-
   illustrationArea: {
     flex: 1,
     minHeight: 300,
@@ -207,10 +171,6 @@ const styles = StyleSheet.create({
     width: "100%",
     height: 300,
   },
-
-  /* ================================
-     HELLO BUBBLE
-  ================================= */
 
   helloBubble: {
     position: "absolute",
@@ -246,10 +206,6 @@ const styles = StyleSheet.create({
     ],
   },
 
-  /* ================================
-     HOLA BUBBLE
-  ================================= */
-
   holaBubble: {
     position: "absolute",
     right: -4,
@@ -283,10 +239,6 @@ const styles = StyleSheet.create({
       },
     ],
   },
-
-  /* ================================
-     CHINESE BUBBLE
-  ================================= */
 
   chineseBubble: {
     position: "absolute",
@@ -322,10 +274,6 @@ const styles = StyleSheet.create({
     ],
   },
 
-  /* ================================
-     PAGINATION
-  ================================= */
-
   pagination: {
     height: 14,
     flexDirection: "row",
@@ -349,10 +297,6 @@ const styles = StyleSheet.create({
     borderRadius: 6,
     backgroundColor: "#5B2BFF",
   },
-
-  /* ================================
-     GET STARTED
-  ================================= */
 
   getStarted: {
     width: "100%",

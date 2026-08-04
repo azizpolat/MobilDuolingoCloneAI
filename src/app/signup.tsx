@@ -2,7 +2,7 @@ import { images } from "@/constants/images";
 import { AntDesign, FontAwesome, Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
-import { useRef, useState, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   Image,
   KeyboardAvoidingView,
@@ -48,7 +48,9 @@ export default function SignUp() {
         return;
       }
 
-      const { error: sendError } = await (signUp as any).verifications.sendEmailCode();
+      const { error: sendError } = await (
+        signUp as any
+      ).verifications.sendEmailCode();
       if (sendError) {
         console.error("sendEmailCode error:", sendError);
         return;
@@ -92,23 +94,31 @@ export default function SignUp() {
       const combinedCode = nextCode.join("");
 
       try {
-        const { error } = await (signUp as any).verifications.verifyEmailCode({ code: combinedCode });
+        const { error } = await signUp.verifications.verifyEmailCode({
+          code: combinedCode,
+        });
         if (error) {
           console.error("verifyEmailCode error:", error);
           return;
         }
 
-        const { error: finalizeError } = await signUp.finalize();
-        if (finalizeError) {
-          console.error("signUp.finalize error:", finalizeError);
-          return;
-        }
+        console.log("signUp.status after verify:", signUp.status); // debug
 
-        // After finalize, Clerk should update useAuth and user will be signed in
-        setTimeout(() => {
-          setShowVerificationModal(false);
-          router.replace("/");
-        }, 150);
+        if (signUp.status === "complete") {
+          await signUp.finalize({
+            navigate: ({ session }) => {
+              if (session?.currentTask) return;
+              setShowVerificationModal(false);
+              router.replace("/");
+            },
+          });
+        } else {
+          console.warn(
+            "Sign-up not complete yet, status:",
+            signUp.status,
+            signUp.missingFields,
+          );
+        }
       } catch (e) {
         console.error("verification flow error:", e);
       }
@@ -268,10 +278,10 @@ export default function SignUp() {
 
             <View style={styles.signupContainer}>
               <Text style={styles.signupNormalText}>
-                Don't have an account? {" "}
+                Don't have an account?{" "}
               </Text>
 
-              <TouchableOpacity onPress={() => router.replace("/signup")}> 
+              <TouchableOpacity onPress={() => router.replace("/signup")}>
                 <Text style={styles.signupLink}>Sign Up</Text>
               </TouchableOpacity>
             </View>
@@ -304,7 +314,7 @@ export default function SignUp() {
               <Text style={styles.modalTitle}>Check your email</Text>
 
               <Text style={styles.modalDescription}>
-                We sent a 6-digit verification code to {" "}
+                We sent a 6-digit verification code to{" "}
                 <Text style={styles.modalEmail}>{email}</Text>. Enter it below.
               </Text>
 
