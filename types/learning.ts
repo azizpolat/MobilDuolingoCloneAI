@@ -1,57 +1,72 @@
-export const LANGUAGE_CODES = ['es', 'fr', 'ja'] as const;
-export type LanguageCode = (typeof LANGUAGE_CODES)[number];
+export type LanguageCode = "es" | "fr" | "ja" | "ko" | "de" | "zh";
 
-export const ACTIVITY_TYPES = ['flashcards', 'sentence_translation', 'listen_and_repeat', 'fill_in_the_blank', 'match_pairs'] as const;
-export type ActivityType = (typeof ACTIVITY_TYPES)[number];
-
-export interface LearningLanguage {
+export interface Language {
   code: LanguageCode;
   name: string;
   nativeName: string;
   flag: string;
-  description: string;
+  color: string;
+  learners: string;
 }
 
-export interface LearningUnit {
+export type ActivityType =
+  | "vocabulary"
+  | "translate"
+  | "multiple-choice"
+  | "listen";
+
+export interface VocabularyItem {
+  word: string;
+  translation: string;
+  pronunciation: string;
+  emoji?: string;
+}
+
+export interface Phrase {
+  text: string;
+  translation: string;
+  pronunciation: string;
+}
+
+export interface Activity {
+  id: string;
+  type: ActivityType;
+  question: string;
+  correctAnswer: string;
+  options?: string[];
+  hint?: string;
+}
+
+export interface LessonGoal {
+  description: string;
+  xpReward: number;
+}
+
+export interface AITeacherPrompt {
+  systemPrompt: string;
+  introMessage: string;
+  topics: string[];
+}
+
+export interface Lesson {
+  id: string;
+  unitId: string;
+  title: string;
+  description: string;
+  icon: string;
+  xpReward: number;
+  goals: LessonGoal[];
+  vocabulary: VocabularyItem[];
+  phrases: Phrase[];
+  activities: Activity[];
+  aiTeacherPrompt: AITeacherPrompt;
+}
+
+export interface Unit {
   id: string;
   languageCode: LanguageCode;
   title: string;
   description: string;
   order: number;
   lessonIds: string[];
-}
-
-export interface VocabularyItem {
-  word: string;
-  translation: string;
-  partOfSpeech?: string;
-  example?: string;
-}
-
-export interface PhraseItem {
-  phrase: string;
-  translation: string;
-  context?: string;
-}
-
-export interface LearningActivity {
-  id: string;
-  type: ActivityType;
-  title: string;
-  instructions: string;
-  prompts: string[];
-}
-
-export interface LearningLesson {
-  id: string;
-  unitId: string;
-  title: string;
-  description: string;
-  order: number;
-  skills: string[];
-  goals: string[];
-  vocabulary: VocabularyItem[];
-  phrases: PhraseItem[];
-  activities: LearningActivity[];
-  aiTeacherPrompt: string;
 }

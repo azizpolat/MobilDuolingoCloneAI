@@ -1,28 +1,54 @@
-import type { LearningUnit } from '@/types/learning';
+import { Unit } from "@/types/learning";
 
-export const units: LearningUnit[] = [
+export const UNITS: Unit[] = [
   {
-    id: 'spanish-basics',
-    languageCode: 'es',
-    title: 'Spanish Basics',
-    description: 'Start with greetings, classroom words, and easy Spanish phrases.',
+    id: "es-unit-1",
+    languageCode: "es",
+    title: "Greetings & Basics",
+    description: "Start your Spanish journey with everyday phrases",
     order: 1,
-    lessonIds: ['spanish-1-1', 'spanish-1-2'],
+    lessonIds: ["es-lesson-1", "es-lesson-2", "es-lesson-3"],
   },
   {
-    id: 'french-basics',
-    languageCode: 'fr',
-    title: 'French Basics',
-    description: 'Build beginner French confidence with polite greetings and simple expressions.',
+    id: "fr-unit-1",
+    languageCode: "fr",
+    title: "Bonjour! Greetings",
+    description: "Learn how to greet and introduce yourself in French",
     order: 1,
-    lessonIds: ['french-1-1'],
+    lessonIds: [
+      "fr-lesson-1",
+      "fr-lesson-2",
+      "fr-lesson-3",
+      "fr-lesson-4",
+      "fr-lesson-5",
+    ],
   },
   {
-    id: 'japanese-basics',
-    languageCode: 'ja',
-    title: 'Japanese Basics',
-    description: 'Learn beginner Japanese greetings, simple words, and everyday phrases.',
+    id: "ja-unit-1",
+    languageCode: "ja",
+    title: "はじめまして — First Steps",
+    description: "Learn essential Japanese phrases for meeting people",
     order: 1,
-    lessonIds: ['japanese-1-1'],
+    lessonIds: [
+      "ja-lesson-1",
+      "ja-lesson-2",
+      "ja-lesson-3",
+      "ja-lesson-4",
+      "ja-lesson-5",
+    ],
+  },
+  {
+    id: "de-unit-1",
+    languageCode: "de",
+    title: "Hallo! German Basics",
+    description: "Master everyday German greetings and introductions",
+    order: 1,
+    lessonIds: [
+      "de-lesson-1",
+      "de-lesson-2",
+      "de-lesson-3",
+      "de-lesson-4",
+      "de-lesson-5",
+    ],
   },
 ];

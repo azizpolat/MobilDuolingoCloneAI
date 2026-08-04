@@ -65,7 +65,9 @@ export default function SignIn() {
         return;
       }
 
-      const { error: sendError } = await (signIn as any).verifications.sendEmailCode();
+      const { error: sendError } = await (
+        signIn as any
+      ).verifications.sendEmailCode();
       if (sendError) {
         console.error("sendEmailCode error:", sendError);
         return;
@@ -104,12 +106,14 @@ export default function SignIn() {
       codeInputs.current[index + 1]?.focus();
     }
 
-      // 6 hane tamamlandı
+    // 6 hane tamamlandı
     if (nextCode.every((item) => item.length === 1)) {
       const combinedCode = nextCode.join("");
       (async () => {
         try {
-          const { error } = await (signIn as any).verifications.verifyEmailCode({ code: combinedCode });
+          const { error } = await (signIn as any).verifications.verifyEmailCode(
+            { code: combinedCode },
+          );
           if (error) {
             console.error("verifyEmailCode error:", error);
             return;
@@ -305,10 +309,6 @@ export default function SignIn() {
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
-
-      {/* ================================================= */}
-      {/* VERIFICATION MODAL */}
-      {/* ================================================= */}
 
       <Modal
         visible={showVerificationModal}
