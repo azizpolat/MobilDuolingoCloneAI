@@ -1,4 +1,5 @@
 import { images } from "@/constants/images";
+import { posthog } from "../config/posthog";
 import { languages } from "@/data/languages";
 import { useLanguageStore } from "@/store/language-store";
 import { Link, useRouter } from "expo-router";
@@ -30,6 +31,7 @@ export default function LanguageSelection() {
     if (!selectedCode) return;
 
     setSelectedLanguageCode(selectedCode);
+    posthog?.capture("language_selected", { language_code: selectedCode });
 
     router.replace("/");
   };

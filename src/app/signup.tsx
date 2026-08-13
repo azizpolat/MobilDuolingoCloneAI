@@ -21,6 +21,7 @@ import {
 import { useAuth, useSignUp } from "@clerk/expo";
 import { useHostedAuth } from "@clerk/expo/hosted-auth";
 
+import { posthog } from "../config/posthog";
 import { useLanguageStore } from "@/store/language-store";
 
 export default function SignUp() {
@@ -111,6 +112,7 @@ export default function SignUp() {
           await signUp.finalize({
             navigate: ({ session }) => {
               if (session?.currentTask) return;
+              posthog?.capture("sign_up_completed", { method: "email_code" });
               setShowVerificationModal(false);
               router.replace(selectedLanguageCode ? "/" : "/language-selection");
             },

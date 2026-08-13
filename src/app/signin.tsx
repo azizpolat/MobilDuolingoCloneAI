@@ -20,6 +20,7 @@ import {
 
 import { useSignIn } from "@clerk/expo";
 
+import { posthog } from "../config/posthog";
 import { useLanguageStore } from "@/store/language-store";
 
 export default function SignIn() {
@@ -56,6 +57,7 @@ export default function SignIn() {
         }
 
         // If sign-in creates a session, navigate to the appropriate route
+        posthog?.capture("sign_in_completed", { method: "password" });
         router.replace(selectedLanguageCode ? "/" : "/language-selection");
         return;
       }
@@ -122,6 +124,7 @@ export default function SignIn() {
           }
 
           // On successful verification, navigate to the appropriate route
+          posthog?.capture("sign_in_completed", { method: "email_code" });
           setTimeout(() => {
             setShowVerificationModal(false);
             router.replace(selectedLanguageCode ? "/" : "/language-selection");

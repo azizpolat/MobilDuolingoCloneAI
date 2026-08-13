@@ -1,4 +1,5 @@
 import { images } from "@/constants/images";
+import { posthog } from "../config/posthog";
 import { Link } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import {
@@ -78,7 +79,11 @@ export default function Onboarding() {
           </View>
 
           <Link href="/signup" asChild>
-            <TouchableOpacity activeOpacity={0.85} style={styles.getStarted}>
+            <TouchableOpacity
+              activeOpacity={0.85}
+              style={styles.getStarted}
+              onPress={() => posthog?.capture("onboarding_started")}
+            >
               <Text style={styles.getStartedText}>Get Started</Text>
 
               <Text style={styles.arrow}>›</Text>

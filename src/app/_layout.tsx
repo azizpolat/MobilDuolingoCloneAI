@@ -1,10 +1,13 @@
-import { ClerkProvider, useAuth } from "@clerk/expo";
+import { ClerkProvider, useAuth, useUser } from "@clerk/expo";
 import { tokenCache } from "@clerk/expo/token-cache";
 import { useFonts } from "expo-font";
 import { Stack, useRouter, useSegments } from "expo-router";
-import { useEffect } from "react";
+import { PostHogErrorBoundary, PostHogProvider } from "posthog-react-native";
+import { Text, View } from "react-native";
+import { useEffect, useRef } from "react";
 import "../../global.css";
 
+import { posthog } from "../config/posthog";
 import { useLanguageStore } from "@/store/language-store";
 
 const fontMap = {
@@ -13,6 +16,53 @@ const fontMap = {
   Poppins_600SemiBold: require("../../assets/fonts/Poppins-SemiBold.ttf"),
   Poppins_700Bold: require("../../assets/fonts/Poppins-Bold.ttf"),
 };
+
+function ErrorFallback() {
+  return (
+    <View className="flex-1 items-center justify-center bg-white px-6">
+      <Text className="text-center text-lg font-semibold text-gray-900">
+        Something went wrong. Please restart the app.
+      </Text>
+    </View>
+  );
+}
+
+function PostHogIdentity() {
+  const { isLoaded, isSignedIn } = useAuth();
+  const { user } = useUser();
+  const identifiedUserId = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!isLoaded) {
+      return;
+    }
+
+    if (!isSignedIn) {
+      if (identifiedUserId.current) {
+        posthog?.reset();
+        identifiedUserId.current = null;
+      }
+      return;
+    }
+
+    if (!user?.id || identifiedUserId.current === user.id) {
+      return;
+    }
+
+    if (identifiedUserId.current) {
+      posthog?.reset();
+    }
+
+    const email = user.primaryEmailAddress?.emailAddress;
+
+    posthog?.identify(user.id, {
+      $set: email ? { email } : {},
+    });
+    identifiedUserId.current = user.id;
+  }, [isLoaded, isSignedIn, user]);
+
+  return null;
+}
 
 function NavigationGuard() {
   const { isLoaded, isSignedIn } = useAuth();
@@ -86,8 +136,9 @@ export default function RootLayout() {
     );
   }
 
-  return (
-    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+  const navigator = (
+    <>
+      <PostHogIdentity />
       <NavigationGuard />
 
       <Stack
@@ -95,6 +146,20 @@ export default function RootLayout() {
           headerShown: false,
         }}
       />
+    </>
+  );
+
+  return (
+    <ClerkProvider publishableKey={publishableKey} tokenCache={tokenCache}>
+      {posthog ? (
+        <PostHogProvider client={posthog}>
+          <PostHogErrorBoundary fallback={ErrorFallback}>
+            {navigator}
+          </PostHogErrorBoundary>
+        </PostHogProvider>
+      ) : (
+        navigator
+      )}
     </ClerkProvider>
   );
 }
