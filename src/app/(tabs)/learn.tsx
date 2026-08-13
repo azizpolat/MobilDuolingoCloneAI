@@ -1,11 +1,7 @@
-import React from "react";
-import { View, Text } from "react-native";
-
-import React from "react";
-import { View, Text, ScrollView, TouchableOpacity } from "react-native";
 import { UNITS } from "@/data/units";
 import { useLanguageStore } from "@/store/language-store";
 import { useRouter } from "expo-router";
+import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function LearnScreen() {
   const selectedLanguage = useLanguageStore((s) => s.selectedLanguage);
@@ -24,7 +20,9 @@ export default function LearnScreen() {
           <TouchableOpacity
             key={unit.id}
             activeOpacity={0.8}
-            onPress={() => router.push({ pathname: "/unit", params: { unitId: unit.id } })}
+            onPress={() =>
+              router.push({ pathname: "/unit", params: { unitId: unit.id } })
+            }
             className="bg-white rounded-2xl p-4 mb-3"
           >
             <Text className="font-semibold">{unit.title}</Text>
@@ -33,7 +31,9 @@ export default function LearnScreen() {
         ))}
 
         {unitsForLang.length === 0 && (
-          <Text className="text-gray-500 mt-6">No units available for this language.</Text>
+          <Text className="text-gray-500 mt-6">
+            No units available for this language.
+          </Text>
         )}
       </ScrollView>
     </View>
