@@ -51,4 +51,32 @@ export const UNITS: Unit[] = [
       "de-lesson-5",
     ],
   },
+  {
+    id: "ko-unit-1",
+    languageCode: "ko",
+    title: "안녕하세요 — Korean Basics",
+    description: "Start Korean with essential greetings and phrases",
+    order: 1,
+    lessonIds: [
+      "ko-lesson-1",
+      "ko-lesson-2",
+      "ko-lesson-3",
+      "ko-lesson-4",
+      "ko-lesson-5",
+    ],
+  },
+  {
+    id: "zh-unit-1",
+    languageCode: "zh",
+    title: "你好 — Chinese Basics",
+    description: "Learn Mandarin greetings and introductory phrases",
+    order: 1,
+    lessonIds: [
+      "zh-lesson-1",
+      "zh-lesson-2",
+      "zh-lesson-3",
+      "zh-lesson-4",
+      "zh-lesson-5",
+    ],
+  },
 ];

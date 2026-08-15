@@ -60,6 +60,8 @@ export interface Lesson {
   phrases: Phrase[];
   activities: Activity[];
   aiTeacherPrompt: AITeacherPrompt;
+  // optional image URL or local asset reference for lesson artwork
+  image?: string;
 }
 
 export interface Unit {

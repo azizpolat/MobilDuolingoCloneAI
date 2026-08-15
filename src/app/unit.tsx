@@ -6,6 +6,7 @@ import {
   Text,
   Image,
   TouchableOpacity,
+  StyleSheet,
 } from "react-native";
 import { Link, useRouter, useLocalSearchParams } from "expo-router";
 
@@ -34,7 +35,7 @@ export default function UnitScreen() {
 
   // If selected language has fewer than 2 lessons in the dataset, extend with mock lessons
   if (selectedLanguage && unitLessons.length < 2) {
-    const additional: typeof LESSONS = [];
+    const additional: any[] = [];
     for (let i = 1; i <= 5; i++) {
       additional.push({
         id: `${selectedLanguage.code}-auto-${i}`,
@@ -47,12 +48,13 @@ export default function UnitScreen() {
         vocabulary: [],
         phrases: [],
         activities: [],
+        image: `https://picsum.photos/seed/${selectedLanguage.code}-auto-${i}/300/200`,
         aiTeacherPrompt: {
           systemPrompt: "",
           introMessage: "",
           topics: [],
         },
-      } as any);
+      });
     }
 
     unitLessons = [...unitLessons, ...additional];
@@ -85,89 +87,235 @@ export default function UnitScreen() {
   const totalLessons = unitLessons.length;
   const currentIndex = unitLessons.findIndex((l) => progressMap[l.id] === "in-progress");
 
+  // Header artwork: prefer the in-progress lesson image if available, otherwise fallback to unit/asset
+  const headerImage = unitLessons[currentIndex >= 0 ? currentIndex : 0]?.image ?? images.palace;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <ScrollView contentContainerStyle={{ paddingBottom: 40 }}>
-        {/* Header image and title */}
-        <View style={{ height: 230 }} className="bg-white">
+      <ScrollView showsVerticalScrollIndicator={false}>
+        {/* Header image */}
+        <View style={{ height: 260 }}>
           <Image
-            source={images.palace}
-            style={{ width: "100%", height: 230 }}
+            source={
+              typeof headerImage === "string" ? { uri: headerImage } : headerImage
+            }
+            style={{ width: "100%", height: 260 }}
             resizeMode="cover"
           />
 
-          <View className="absolute left-4 top-12">
+          <View style={styles.backBtnContainer}>
             <Link href="..">
-              <TouchableOpacity className="p-2 bg-white rounded-full opacity-90">
-                <Text className="text-xl">‹</Text>
+              <TouchableOpacity style={styles.backBtn}>
+                <Text style={{ fontSize: 20 }}>‹</Text>
               </TouchableOpacity>
             </Link>
           </View>
 
-          <View className="absolute left-6 top-28">
-            <Text className="text-2xl font-semibold text-white">{unitLessons[currentIndex >= 0 ? currentIndex : 0]?.title ?? unit.title}</Text>
-            <Text className="text-sm text-white/90">Unit {unit.order} • {currentIndex + 1} / {totalLessons} lessons</Text>
+          <View style={styles.headerTextContainer}>
+            <Text style={styles.titleText}>{unitLessons[currentIndex >= 0 ? currentIndex : 0]?.title ?? unit.title}</Text>
+            <Text style={styles.subtitleText}>Unit {unit.order} • {Math.max(1, currentIndex + 1)} / {totalLessons} lessons</Text>
           </View>
         </View>
 
-        {/* Tab selector (Lessons / Practice) */}
-        <View className="p-4 bg-transparent">
-          <View className="flex-row bg-white rounded-2xl p-1 mx-4 shadow-sm">
-            <View className="flex-1 items-center py-3 rounded-2xl bg-white">
-              <Text className="text-purple-600 font-semibold">Lessons</Text>
-            </View>
-            <View className="flex-1 items-center py-3 rounded-2xl">
-              <Text className="text-gray-400">Practice</Text>
+        {/* White rounded panel overlapping the image */}
+        <View style={styles.panel}>
+          {/* Tabs */}
+          <View style={styles.segmentWrapper}>
+            <View style={styles.segmentControl}>
+              <View style={styles.segmentActive}>
+                <Text style={styles.segmentActiveText}>Lessons</Text>
+              </View>
+              <View style={styles.segmentInactive}>
+                <Text style={styles.segmentInactiveText}>Practice</Text>
+              </View>
             </View>
           </View>
-        </View>
 
-        {/* Lessons list */}
-        <View className="mt-4 px-4">
-          {unitLessons.map((lesson, idx) => {
-            const status = progressMap[lesson.id] ?? "locked";
-            const isActive = status === "in-progress";
-            const isCompleted = status === "completed";
+          {/* Lessons list */}
+          <View style={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 40 }}>
+            {unitLessons.map((lesson: any, idx: number) => {
+              const status = progressMap[lesson.id] ?? "locked";
+              const isActive = status === "in-progress";
+              const isCompleted = status === "completed";
 
-            return (
-              <TouchableOpacity
-                key={lesson.id}
-                activeOpacity={0.8}
-                onPress={() => router.push({ pathname: "/lesson", params: { lessonId: lesson.id } })}
-                className={`bg-white rounded-2xl px-4 py-5 mb-3 flex-row items-center justify-between ${isActive ? "border-2 border-purple-300" : "border border-gray-100"}`}
-              >
-                <View style={{ flex: 1 }}>
-                  <Text className="text-xs text-gray-400">Lesson {idx + 1}</Text>
-                  <Text className="text-base font-semibold mt-1">{lesson.title}</Text>
-                  {isActive ? (
-                    <Text className="text-sm text-purple-600 mt-1">In progress</Text>
-                  ) : (
-                    !isCompleted && <Text className="text-sm text-gray-400 mt-1">0 / 6 lessons</Text>
-                  )}
-                </View>
+              return (
+                <TouchableOpacity
+                  key={lesson.id}
+                  activeOpacity={0.85}
+                  onPress={() => router.push({ pathname: "/lesson", params: { lessonId: lesson.id } })}
+                  style={[
+                    styles.lessonCard,
+                    isActive ? styles.lessonCardActive : { borderColor: "#F1F5F9" },
+                  ]}
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={[styles.lessonSmall, isActive && styles.lessonSmallActive]}>Lesson {idx + 1}</Text>
+                    <Text style={styles.lessonTitle}>{lesson.title}</Text>
+                    {isActive ? (
+                      <Text style={styles.lessonInProgress}>In progress</Text>
+                    ) : (
+                      !isCompleted && <Text style={styles.lessonSmallMuted}>0 / 6 lessons</Text>
+                    )}
+                  </View>
 
-                <View style={{ width: 56, alignItems: "center" }}>
-                  {isCompleted ? (
-                    <View className="w-8 h-8 rounded-full bg-green-100 items-center justify-center">
-                      <Text className="text-green-600">✓</Text>
-                    </View>
-                  ) : isActive ? (
-                    <Image
-                      source={images.treasure}
-                      style={{ width: 44, height: 44 }}
-                      resizeMode="contain"
-                    />
-                  ) : (
-                    <View className="w-8 h-8 rounded-full border border-gray-300 items-center justify-center">
-                      <Text className="text-gray-400">🔒</Text>
-                    </View>
-                  )}
-                </View>
-              </TouchableOpacity>
-            );
-          })}
+                  <View style={{ width: 64, alignItems: "center" }}>
+                    {isCompleted ? (
+                      <View style={styles.completedCircle}>
+                        <Text style={styles.completedCheck}>✓</Text>
+                      </View>
+                    ) : isActive ? (
+                      <Image
+                        source={ lesson.image ? { uri: lesson.image } : images.treasure }
+                        style={{ width: 48, height: 48, borderRadius: 10 }}
+                        resizeMode="cover"
+                      />
+                    ) : (
+                      <View style={styles.lockCircle}>
+                        <Text style={{ color: "#9CA3AF" }}>🔒</Text>
+                      </View>
+                    )}
+                  </View>
+                </TouchableOpacity>
+              );
+            })}
+          </View>
         </View>
       </ScrollView>
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  backBtnContainer: {
+    position: "absolute",
+    left: 12,
+    top: 12,
+  },
+  backBtn: {
+    backgroundColor: "#FFFFFF",
+    padding: 8,
+    borderRadius: 18,
+    opacity: 0.95,
+  },
+  headerTextContainer: {
+    position: "absolute",
+    left: 18,
+    top: 60,
+  },
+  titleText: {
+    color: "#0F172A",
+    fontSize: 22,
+    fontWeight: "700",
+  },
+  subtitleText: {
+    color: "#64748B",
+    fontSize: 13,
+    marginTop: 6,
+  },
+  panel: {
+    marginTop: -26,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    backgroundColor: "#FFFFFF",
+    paddingTop: 18,
+    minHeight: 400,
+  },
+  segmentWrapper: {
+    paddingHorizontal: 20,
+    marginBottom: 8,
+  },
+  segmentControl: {
+    flexDirection: "row",
+    backgroundColor: "#F8FAFC",
+    borderRadius: 16,
+    overflow: "hidden",
+    height: 54,
+    alignItems: "center",
+  },
+  segmentActive: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#FFFFFF",
+    borderBottomWidth: 3,
+    borderBottomColor: "#6D28D9",
+    borderRadius: 14,
+    margin: 6,
+    shadowColor: "#6D28D9",
+    shadowOpacity: 0.12,
+    shadowRadius: 6,
+  },
+  segmentActiveText: {
+    color: "#6D28D9",
+    fontWeight: "700",
+  },
+  segmentInactive: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  segmentInactiveText: {
+    color: "#94A3B8",
+  },
+  lessonCard: {
+    backgroundColor: "#FFFFFF",
+    borderRadius: 14,
+    paddingVertical: 16,
+    paddingHorizontal: 16,
+    marginVertical: 6,
+    flexDirection: "row",
+    alignItems: "center",
+    borderWidth: 1,
+    borderColor: "#F1F5F9",
+  },
+  lessonCardActive: {
+    borderColor: "#7C3AED",
+    shadowColor: "#7C3AED",
+    shadowOpacity: 0.08,
+    shadowRadius: 10,
+  },
+  lessonSmall: {
+    color: "#94A3B8",
+    fontSize: 12,
+  },
+  lessonSmallMuted: {
+    color: "#94A3B8",
+    fontSize: 12,
+    marginTop: 6,
+  },
+  lessonTitle: {
+    fontSize: 16,
+    fontWeight: "700",
+    color: "#0F172A",
+    marginTop: 6,
+  },
+  lessonInProgress: {
+    color: "#6D28D9",
+    marginTop: 6,
+  },
+  completedCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: "#10B981", // green
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  completedCheck: {
+    color: "#FFFFFF",
+    fontWeight: "700",
+  },
+  lockCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: "#E6E7EB",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  lessonSmallActive: {
+    color: "#7C3AED",
+    fontSize: 12,
+  },
+});
