@@ -1,5 +1,5 @@
 import React, { useMemo } from "react";
-import { SafeAreaView, View, Text, Image, TouchableOpacity } from "react-native";
+import { SafeAreaView, View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useLocalSearchParams, Link } from "expo-router";
 
 import { LESSONS } from "@/data/lessons";
@@ -14,38 +14,40 @@ export default function LessonScreen() {
   if (!lesson) {
     return (
       <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
-        <View className="p-6">
+        <View style={{ padding: 20 }}>
           <Text>Lesson not found</Text>
         </View>
       </SafeAreaView>
     );
   }
 
+  const imageSource = lesson.image ? { uri: lesson.image } : images.palace;
+
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
-      <View className="p-4">
-        <View className="flex-row items-center mb-4">
+      <View style={{ padding: 16 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
           <Link href="..">
-            <TouchableOpacity className="p-2 mr-2 bg-white rounded-full">
-              <Text className="text-xl">‹</Text>
+            <TouchableOpacity style={styles.backBtn}>
+              <Text style={{ fontSize: 20 }}>‹</Text>
             </TouchableOpacity>
           </Link>
 
-          <Text className="text-xl font-semibold">{lesson.title}</Text>
+          <Text style={{ fontSize: 20, fontWeight: "700", marginLeft: 8 }}>{lesson.title}</Text>
         </View>
 
-        <Image source={images.palace} style={{ width: "100%", height: 180 }} resizeMode="cover" />
+        <Image source={imageSource} style={{ width: "100%", height: 180, borderRadius: 12 }} resizeMode="cover" />
 
-        <View className="mt-4">
-          <Text className="text-base font-semibold">{lesson.title}</Text>
-          <Text className="text-sm text-gray-500 mt-2">{lesson.description}</Text>
+        <View style={{ marginTop: 16 }}>
+          <Text style={{ fontSize: 16, fontWeight: "700" }}>{lesson.title}</Text>
+          <Text style={{ color: "#64748B", marginTop: 8 }}>{lesson.description}</Text>
         </View>
 
-        <View className="mt-6">
-          <Text className="font-semibold mb-2">Activities</Text>
-          {lesson.activities.slice(0, 3).map((a) => (
-            <View key={a.id} className="bg-white rounded-xl p-3 mb-2 border border-gray-100">
-              <Text className="text-sm">{a.question}</Text>
+        <View style={{ marginTop: 18 }}>
+          <Text style={{ fontWeight: "700", marginBottom: 8 }}>Activities</Text>
+          {lesson.activities && lesson.activities.slice(0, 4).map((a) => (
+            <View key={a.id} style={styles.activityRow}>
+              <Text>{a.question}</Text>
             </View>
           ))}
         </View>
@@ -53,3 +55,19 @@ export default function LessonScreen() {
     </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  backBtn: {
+    backgroundColor: "#FFFFFF",
+    padding: 8,
+    borderRadius: 18,
+  },
+  activityRow: {
+    backgroundColor: "#FFF",
+    borderRadius: 10,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: "#EEF2FF",
+    marginBottom: 8,
+  },
+});
