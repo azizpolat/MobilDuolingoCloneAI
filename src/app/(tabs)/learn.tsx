@@ -5,6 +5,7 @@ import { ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function LearnScreen() {
   const selectedLanguage = useLanguageStore((s) => s.selectedLanguage);
+
   const router = useRouter();
 
   const unitsForLang = UNITS.filter(
@@ -14,7 +15,7 @@ export default function LearnScreen() {
   return (
     <View className="flex-1 bg-neutral-background">
       <ScrollView contentContainerStyle={{ padding: 20 }}>
-        <Text className="text-2xl font-semibold mb-4">Learn</Text>
+        <Text className="text-2xl font-semibold mb-4 mt-10">Learn</Text>
 
         {unitsForLang.map((unit) => (
           <TouchableOpacity
@@ -25,7 +26,7 @@ export default function LearnScreen() {
             }
             className="bg-white rounded-2xl p-4 mb-3"
           >
-            <Text className="font-semibold">{unit.title}</Text>
+            <Text className="font-semibold mb-2">{unit.title}</Text>
             <Text className="text-sm text-gray-500">{unit.description}</Text>
           </TouchableOpacity>
         ))}

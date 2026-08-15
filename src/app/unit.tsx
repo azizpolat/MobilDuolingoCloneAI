@@ -1,19 +1,19 @@
-import React, { useMemo, useState } from "react";
+import { Link, useLocalSearchParams, useRouter } from "expo-router";
+import { useMemo, useState } from "react";
 import {
+  Image,
   SafeAreaView,
   ScrollView,
-  View,
-  Text,
-  Image,
-  TouchableOpacity,
   StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
 } from "react-native";
-import { Link, useRouter, useLocalSearchParams } from "expo-router";
 
-import { UNITS } from "@/data/units";
-import { LESSONS } from "@/data/lessons";
-import { useLanguageStore } from "@/store/language-store";
 import { images } from "@/constants/images";
+import { LESSONS } from "@/data/lessons";
+import { UNITS } from "@/data/units";
+import { useLanguageStore } from "@/store/language-store";
 
 export default function UnitScreen() {
   const router = useRouter();
@@ -61,7 +61,9 @@ export default function UnitScreen() {
   }
 
   // Mock local progress state for lessons
-  const [progressMap] = useState<Record<string, "completed" | "in-progress" | "locked">>(() => {
+  const [progressMap] = useState<
+    Record<string, "completed" | "in-progress" | "locked">
+  >(() => {
     const map: Record<string, "completed" | "in-progress" | "locked"> = {};
 
     unitLessons.forEach((lesson, idx) => {
@@ -85,10 +87,13 @@ export default function UnitScreen() {
   }
 
   const totalLessons = unitLessons.length;
-  const currentIndex = unitLessons.findIndex((l) => progressMap[l.id] === "in-progress");
+  const currentIndex = unitLessons.findIndex(
+    (l) => progressMap[l.id] === "in-progress",
+  );
 
   // Header artwork: prefer the in-progress lesson image if available, otherwise fallback to unit/asset
-  const headerImage = unitLessons[currentIndex >= 0 ? currentIndex : 0]?.image ?? images.palace;
+  const headerImage =
+    unitLessons[currentIndex >= 0 ? currentIndex : 0]?.image ?? images.palace;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
@@ -97,7 +102,9 @@ export default function UnitScreen() {
         <View style={{ height: 260 }}>
           <Image
             source={
-              typeof headerImage === "string" ? { uri: headerImage } : headerImage
+              typeof headerImage === "string"
+                ? { uri: headerImage }
+                : headerImage
             }
             style={{ width: "100%", height: 260 }}
             resizeMode="cover"
@@ -105,15 +112,24 @@ export default function UnitScreen() {
 
           <View style={styles.backBtnContainer}>
             <Link href="..">
-              <TouchableOpacity style={styles.backBtn}>
+              <TouchableOpacity
+                style={styles.backBtn}
+                onPress={() => router.back()}
+              >
                 <Text style={{ fontSize: 20 }}>‹</Text>
               </TouchableOpacity>
             </Link>
           </View>
 
           <View style={styles.headerTextContainer}>
-            <Text style={styles.titleText}>{unitLessons[currentIndex >= 0 ? currentIndex : 0]?.title ?? unit.title}</Text>
-            <Text style={styles.subtitleText}>Unit {unit.order} • {Math.max(1, currentIndex + 1)} / {totalLessons} lessons</Text>
+            <Text style={styles.titleText}>
+              {unitLessons[currentIndex >= 0 ? currentIndex : 0]?.title ??
+                unit.title}
+            </Text>
+            <Text style={styles.subtitleText}>
+              Unit {unit.order} • {Math.max(1, currentIndex + 1)} /{" "}
+              {totalLessons} lessons
+            </Text>
           </View>
         </View>
 
@@ -132,7 +148,9 @@ export default function UnitScreen() {
           </View>
 
           {/* Lessons list */}
-          <View style={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 40 }}>
+          <View
+            style={{ paddingHorizontal: 8, paddingTop: 8, paddingBottom: 40 }}
+          >
             {unitLessons.map((lesson: any, idx: number) => {
               const status = progressMap[lesson.id] ?? "locked";
               const isActive = status === "in-progress";
@@ -142,19 +160,37 @@ export default function UnitScreen() {
                 <TouchableOpacity
                   key={lesson.id}
                   activeOpacity={0.85}
-                  onPress={() => router.push({ pathname: "/lesson", params: { lessonId: lesson.id } })}
+                  onPress={() =>
+                    router.push({
+                      pathname: "/lesson",
+                      params: { lessonId: lesson.id },
+                    })
+                  }
                   style={[
                     styles.lessonCard,
-                    isActive ? styles.lessonCardActive : { borderColor: "#F1F5F9" },
+                    isActive
+                      ? styles.lessonCardActive
+                      : { borderColor: "#F1F5F9" },
                   ]}
                 >
                   <View style={{ flex: 1 }}>
-                    <Text style={[styles.lessonSmall, isActive && styles.lessonSmallActive]}>Lesson {idx + 1}</Text>
+                    <Text
+                      style={[
+                        styles.lessonSmall,
+                        isActive && styles.lessonSmallActive,
+                      ]}
+                    >
+                      Lesson {idx + 1}
+                    </Text>
                     <Text style={styles.lessonTitle}>{lesson.title}</Text>
                     {isActive ? (
                       <Text style={styles.lessonInProgress}>In progress</Text>
                     ) : (
-                      !isCompleted && <Text style={styles.lessonSmallMuted}>0 / 6 lessons</Text>
+                      !isCompleted && (
+                        <Text style={styles.lessonSmallMuted}>
+                          0 / 6 lessons
+                        </Text>
+                      )
                     )}
                   </View>
 
@@ -165,7 +201,9 @@ export default function UnitScreen() {
                       </View>
                     ) : isActive ? (
                       <Image
-                        source={ lesson.image ? { uri: lesson.image } : images.treasure }
+                        source={
+                          lesson.image ? { uri: lesson.image } : images.treasure
+                        }
                         style={{ width: 48, height: 48, borderRadius: 10 }}
                         resizeMode="cover"
                       />
@@ -203,12 +241,12 @@ const styles = StyleSheet.create({
     top: 60,
   },
   titleText: {
-    color: "#0F172A",
+    color: "#6D28D9",
     fontSize: 22,
     fontWeight: "700",
   },
   subtitleText: {
-    color: "#64748B",
+    color: "#6D28D9",
     fontSize: 13,
     marginTop: 6,
   },
