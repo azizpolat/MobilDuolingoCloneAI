@@ -1,7 +1,9 @@
+import { images } from "@/constants/images";
 import { UNITS } from "@/data/units";
+
 import { useLanguageStore } from "@/store/language-store";
 import { useRouter } from "expo-router";
-import { ScrollView, Text, TouchableOpacity, View } from "react-native";
+import { Image, ScrollView, Text, TouchableOpacity, View } from "react-native";
 
 export default function LearnScreen() {
   const selectedLanguage = useLanguageStore((s) => s.selectedLanguage);
@@ -13,7 +15,7 @@ export default function LearnScreen() {
   );
 
   return (
-    <View className="flex-1 bg-neutral-background">
+    <View className=" bg-neutral-background">
       <ScrollView contentContainerStyle={{ padding: 20 }}>
         <Text className="text-2xl font-semibold mb-4 mt-10">Learn</Text>
 
@@ -24,10 +26,24 @@ export default function LearnScreen() {
             onPress={() =>
               router.push({ pathname: "/unit", params: { unitId: unit.id } })
             }
-            className="bg-white rounded-2xl p-4 mb-3"
+            className="bg-white p-4 mb-3 flex"
           >
-            <Text className="font-semibold mb-2">{unit.title}</Text>
-            <Text className="text-sm text-gray-500">{unit.description}</Text>
+            <View className="rounded-xl bg-white p-4 overflow-hidden border border-gray-200">
+              <Text className="font-semibold mb-2">{unit.title}</Text>
+              <Text className="text-sm text-gray-500">{unit.description}</Text>
+            </View>
+            <View
+              style={{
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+            >
+              <Image
+                source={images.mascotAuth}
+                style={{ width: 400, height: 400 }}
+                resizeMode="contain"
+              />
+            </View>
           </TouchableOpacity>
         ))}
 
