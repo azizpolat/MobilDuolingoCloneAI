@@ -93,7 +93,7 @@ export default function UnitScreen() {
 
   // Header artwork: prefer the in-progress lesson image if available, otherwise fallback to unit/asset
   const headerImage =
-    unitLessons[currentIndex >= 0 ? currentIndex : 0]?.image ?? images.palace;
+    unitLessons[currentIndex >= 0 ? currentIndex : 0]?.image ?? !images.palace;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: "#FFFFFF" }}>
